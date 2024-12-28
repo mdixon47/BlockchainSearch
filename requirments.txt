@@ -1,0 +1,26 @@
+Notes and Next Steps:
+
+Credentials & Security:
+In production, avoid hardcoding credentials. Store secrets (like Alchemy API keys or OpenSearch credentials) in AWS Secrets Manager and reference them at runtime.
+
+Authentication & TLS:
+If you need to secure OpenSearch, set up TLS and possibly use IAM authentication. Adjust the helm chart’s values for production-level security.
+
+VPC Integration:
+If OpenSearch is internal only, ensure Lambda is in the same VPC with proper networking (private subnets, security groups) and that the endpoint is reachable.
+
+Testing:
+After terraform apply, test the API Gateway endpoint and verify logs in CloudWatch and data in OpenSearch.
+
+Scaling & Production Hardening:
+Tune EKS node sizes, enable autoscaling, and add monitoring (CloudWatch, Prometheus) and logging.
+
+Namespace: Both OpenSearch and OpenSearch Dashboards are installed into the same opensearch-namespace for simplicity. Adjust if you prefer separate namespaces.
+Service Type: Currently, both are exposed using type: LoadBalancer. This will create external load balancers accessible over the internet (if your cluster supports it). For a production setup, you might use Ingress with TLS termination and authentication.
+
+opensearchHosts Value: The Dashboards chart typically needs to know where to find the OpenSearch cluster. Using opensearch:9200 relies on Kubernetes DNS service discovery within the same namespace. The service name opensearch must match the name of the Helm release service. If different, update accordingly.
+Security & Auth: In a production environment, consider enabling security plugins, TLS, and proper authentication for both OpenSearch and Dashboards.
+
+Testing: After terraform apply, check the outputs for the load balancer hostnames. You can access the endpoints via browser or curl. 
+
+For Dashboards, typically http://opensearch-dashboards-endpoint/ will give you the UI.
